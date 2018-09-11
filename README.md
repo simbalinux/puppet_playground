@@ -1,7 +1,7 @@
 # Puppet Playground 
 > Puppetmaster & 2 puppet agents (sandbox dev) 
 
-This setup will give you a working puppetmaster & 2 puppet agents using VAGRANT. Ideal for those who need write & test their puppet modules in development. 
+This setup will give you a working puppetmaster & 2 puppet agents using VAGRANT. Ideal for those who need write & test their puppet modules in development. This project will deply "mediawiki" web application.
 
 
 ![](header.png)
