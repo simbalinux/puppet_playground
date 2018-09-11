@@ -60,14 +60,18 @@ Sign each cert
 ```sh
 sudo puppet cert sign agent1 && sudo puppet cert sign agent2
 ```
-Go back to the agents reload them and start the puppet daemon on each agent after reload
+Reload the agents to clear selinux
 ```sh
-vagrant reload agent* (selinux)
-
-then 
-
-sudo systemctl start puppet (inside the agent upon restart)
+vagrant reload agent1
+vagrant reload agent2
 ```
+Deploy the entire 'mediawiki' web application in a single puppet run! Do this on both agents.
+```sh
+sudo puppet agent --verbose --no-daemonize --onetime
+```
+
+In production where the your puppet enviornment is in "noop" mode, use the following tool:
+https://linux.die.net/man/1/pssh
 
 Enjoy!
 ## Release History
