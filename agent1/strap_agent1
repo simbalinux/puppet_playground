@@ -1,0 +1,35 @@
+set -x
+
+echo "172.31.0.201 	puppetmaster puppetmaster.localhost.com"  >> /etc/hosts
+yum -y install http://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm
+yum -y install puppet
+echo "[main]
+    # The Puppet log directory.
+    # The default value is '$vardir/log'.
+    logdir = /var/log/puppet
+
+    # Where Puppet PID files are kept.
+    # The default value is '$vardir/run'.
+    rundir = /var/run/puppet
+
+    # Where SSL certificates are kept.
+    # The default value is '$confdir/ssl'.
+    ssldir = $vardir/ssl
+
+[agent]
+    # The file in which puppetd stores a list of the classes
+    # associated with the retrieved configuratiion.  Can be loaded in
+    # the separate ``puppet`` executable using the ``--loadclasses``
+    # option.
+    # The default value is '$confdir/classes.txt'.
+    classfile = $vardir/classes.txt
+
+    # Where puppetd caches the local configuration.  An
+    # extension indicating the cache format is added automatically.
+    # The default value is '$confdir/localconfig'.
+    localconfig = $vardir/localconfig
+    server = puppetmaster" > /etc/puppet/puppet.conf
+# puppet config print ssld, will tell us the location of the ssl directory, delete all of this to start over and on the certificate signing process
+#Make sure the puppetmaster daemon is started on the Master before the issue of agent certs
+puppet agent --verbose --no-daemonize --onetime
+systemctl start puppet

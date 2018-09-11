@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+set -x
+echo "172.31.0.202      agent1 agent1.localhost.com"  >> /etc/hosts
+setenforce permissive
+sed -i 's\=enforcing\=disabled\g' /etc/sysconfig/selinux
+getenforce
+systemctl disable firewalld
+systemctl stop firewalld
+yum -y install http://yum.puppetlabs.com/puppetlabs-release-el-7.noarch.rpm
+#rpm -ivh https://yum.puppetlabs.com/puppetlabs-release-pc1-el-7.noarch.rpm
+yum -y install puppet-server
+yum -y install vim-enhanced 
+mkdir -p /etc/puppet/environments/production/{modules,manifests}
+ls /etc/puppet/environments/production
+sudo chmod -R 777 /etc/puppet/environments/production/
+echo "
+modulepath = /etc/puppet/environments/production/modules
+environment_timeout = 5s" > /etc/puppet/environments/production/environment.conf
+
+sudo cp -a /etc/puppet/puppet.conf "/etc/puppet/puppet.conf_bak-$(date +"%m-%d-%y-%r")"
+
+echo "[main]
+    # The Puppet log directory.
+    # The default value is '$vardir/log'.
+    logdir = /var/log/puppet
+
+    # Where Puppet PID files are kept.
+    # The default value is '$vardir/run'.
+    rundir = /var/run/puppet
+
+    # Where SSL certificates are kept.
+    # The default value is '$confdir/ssl'.
+    ssldir = \$vardir/ssl
+    #alternative hostnames that the agent can use on the master
+    dns_alt_name = puppet,puppetmaster,puppetmaster.localhost.com
+    environmentpath = \$confdir/environments
+[agent]
+    # The file in which puppetd stores a list of the classes
+    # associated with the retrieved configuratiion.  Can be loaded in
+    # the separate ``puppet`` executable using the ``--loadclasses``
+    # option.
+    # The default value is '$confdir/classes.txt'.
+    classfile = \$vardir/classes.txt
+
+    # Where puppetd caches the local configuration.  An
+    # extension indicating the cache format is added automatically.
+    # The default value is '$confdir/localconfig'.
+    localconfig = \$vardir/localconfig
+[master]
+    environmentpath = \$confdir/environments
+    basemodulepath = \$confdir/modules:/opt/puppet/share/modules" > /etc/puppet/puppet.conf
+# install puppetlabs apache module 
+#puppet module install puppetlabs-apache --modulepath /etc/puppet/environments/production/modules
+
+cd /etc/puppet/environments/production/modules
+puppet module generate --skip-interview simba-mediawiki --environment production && mv simba-mediawiki mediawiki
+puppet module install puppetlabs-stdlib --modulepath /etc/puppet/environments/production/modules --version 4.5.0
+puppet module install puppetlabs-concat --modulepath /etc/puppet/environments/production/modules --version 1.1.2
+puppet module install puppetlabs-apache --modulepath /etc/puppet/environments/production/modules --version 1.2.0
+puppet module install puppetlabs-vcsrepo --modulepath /etc/puppet/environments/production/modules
+puppet module install puppetlabs-mysql --modulepath /etc/puppet/environments/production/modules --version 3.11.0 
+puppet module install puppetlabs-firewall --modulepath /etc/puppet/environments/production/modules
+cp -rf /vagrant/puppetmaster/mediawiki_init.pp /etc/puppet/environments/production/modules/mediawiki/manifests/init.pp
+mkdir /etc/puppet/environments/production/modules/mediawiki/templates
+cp -rf /vagrant/puppetmaster/LocalSettings.erb /etc/puppet/environments/production/modules/mediawiki/templates
+#Run this command after install, it checks to see if there are current SSL certs, create them with this!!!
+#sudo puppet master --verbose --no-daemonize
+#
+###To blow away our SSL certs on master run the command below.
+#rm -r /var/lib/puppet/ssl
+####
+#once you have invoked "sudo puppet agent --verbose --no-daemonize --onetime" on the agent
+#you will need to come back to the paster and issue the following commands:
+#puppet cert list
+#puppet cert sign "hostname"
