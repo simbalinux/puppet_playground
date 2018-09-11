@@ -62,11 +62,11 @@ sudo puppet cert sign agent1 && sudo puppet cert sign agent2
 ```
 Go back to the agents reload them and start the puppet daemon on each agent after reload
 ```sh
-vagrant reload agent*
+vagrant reload agent* (selinux)
 
 then 
 
-sudo systemctl start puppet
+sudo systemctl start puppet (inside the agent upon restart)
 ```
 
 Enjoy!
