@@ -31,5 +31,5 @@ echo "[main]
     server = puppetmaster" > /etc/puppet/puppet.conf
 # puppet config print ssld, will tell us the location of the ssl directory, delete all of this to start over and on the certificate signing process
 #Make sure the puppetmaster daemon is started on the Master before the issue of agent certs
-puppet agent --verbose --no-daemonize --onetime
-systemctl start puppet
+#puppet agent --verbose --no-daemonize --onetime
+#systemctl start puppet

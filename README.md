@@ -60,8 +60,12 @@ Sign each cert
 ```sh
 sudo puppet cert sign agent1 && sudo puppet cert sign agent2
 ```
-Go back to the agents and start the puppet daemon on each
+Go back to the agents reload them and start the puppet daemon on each agent after reload
 ```sh
+vagrant reload agent*
+
+then 
+
 sudo systemctl start puppet
 ```
 
