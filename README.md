@@ -70,7 +70,7 @@ Deploy the entire 'mediawiki' web application in a single puppet run! Do this on
 sudo puppet agent --verbose --no-daemonize --onetime
 ```
 
-In production where the your puppet enviornment is in "noop" mode, use the following tool:
+In production where the puppet server enviornment is in "noop" mode, use the following tool:
 https://linux.die.net/man/1/pssh
 
 Enjoy!
